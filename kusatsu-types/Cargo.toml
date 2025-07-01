@@ -1,0 +1,10 @@
+[package]
+name = "kusatsu-types"
+version = "0.1.0"
+edition = "2021"
+description = "Shared API types for Kusatsu file sharing"
+
+[dependencies]
+serde = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }

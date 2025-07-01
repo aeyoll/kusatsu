@@ -1,0 +1,15 @@
+[package]
+name = "kusatsu-migration"
+version = "0.1.0"
+edition = "2021"
+description = "Database migrations for Kusatsu file sharing"
+
+[dependencies]
+tokio = { workspace = true }
+sea-orm-migration = { workspace = true }
+async-trait = { workspace = true }
+kusatsu-entity = { path = "../kusatsu-entity" }
+
+[dependencies.sea-orm]
+workspace = true
+features = ["runtime-tokio-rustls", "sqlx-postgres"]

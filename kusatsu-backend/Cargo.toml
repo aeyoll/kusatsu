@@ -1,0 +1,40 @@
+[package]
+name = "kusatsu-backend"
+version = "0.1.0"
+edition = "2021"
+description = "Backend server for Kusatsu file sharing"
+
+[lib]
+name = "kusatsu_backend"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kusatsu-backend"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+hyper = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+sea-orm = { workspace = true }
+base64 = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Local dependencies
+kusatsu-entity = { path = "../kusatsu-entity" }
+kusatsu-migration = { path = "../kusatsu-migration" }
+kusatsu-encrypt = { path = "../kusatsu-encrypt" }
+kusatsu-types = { path = "../kusatsu-types" }
+
+[dev-dependencies]
+reqwest = { version = "0.11", features = ["json", "multipart"] }
+tempfile = { workspace = true }

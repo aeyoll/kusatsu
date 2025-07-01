@@ -1,0 +1,76 @@
+[package]
+name = "kusatsu-frontend"
+publish = false
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Yew framework and WASM bindings
+yew = { version = "0.21", features = ["csr"] }
+yew-hooks = "0.3"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+  "console",
+  "Document",
+  "Element",
+  "Event",
+  "EventTarget",
+  "File",
+  "FileList",
+  "FileReader",
+  "HtmlElement",
+  "HtmlInputElement",
+  "Node",
+  "Url",
+  "Window",
+  "DragEvent",
+  "DataTransfer",
+  "DataTransferItemList",
+  "DataTransferItem",
+  "Blob",
+  "Response",
+  "Headers",
+  "Request",
+  "RequestInit",
+  "RequestMode",
+  "Clipboard",
+  "Navigator",
+  "BlobPropertyBag",
+  "ReadableStream",
+  "FileReader",
+  "HtmlDocument",
+  "CssStyleDeclaration",
+  "Storage",
+  "MediaQueryList",
+  "DomTokenList",
+] }
+
+# HTTP client for WASM
+reqwest = { version = "0.11", features = ["json"] }
+gloo = { version = "0.10", features = ["net", "file", "utils"] }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true, features = ["js"] }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Async utilities
+futures = "0.3"
+
+# Base64 encoding
+base64 = { workspace = true }
+
+# Logging
+wasm-logger = "0.2"
+
+# Local dependencies
+kusatsu-encrypt = { path = "../kusatsu-encrypt" }
+kusatsu-types = { path = "../kusatsu-types" }
+yew-router = "0.18.0"
+log = "0.4.27"

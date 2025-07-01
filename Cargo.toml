@@ -1,0 +1,46 @@
+[workspace]
+members = [
+    "kusatsu-backend",
+    "kusatsu-cli",
+    "kusatsu-encrypt",
+    "kusatsu-entity",
+    "kusatsu-frontend",
+    "kusatsu-migration",
+    "kusatsu-types"
+]
+resolver = "2"
+
+[workspace.dependencies]
+# Shared dependencies across crates
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Encryption dependencies
+aes-gcm = "0.10"
+rand = "0.8"
+base64 = "0.22"
+
+# Database dependencies
+sea-orm = { version = "0.12", features = ["runtime-tokio-rustls", "sqlx-postgres", "sqlx-sqlite", "macros"] }
+sea-orm-migration = "0.12"
+
+# Web framework
+axum = { version = "0.7", features = ["multipart"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["fs", "cors", "trace"] }
+hyper = "1.0"
+
+# CLI dependencies
+clap = { version = "4.0", features = ["derive"] }
+
+# Additional dependencies
+async-trait = "0.1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+mime_guess = "2.0"
+tempfile = "3.8"
