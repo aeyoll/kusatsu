@@ -202,14 +202,14 @@ impl ChunkStorage {
                             .duration_since(std::time::UNIX_EPOCH)
                             .unwrap_or_default();
 
-                        if now.as_secs() - created_time.as_secs() > 2 * 3600 {
-                            if fs::remove_dir_all(entry.path()).await.is_ok() {
-                                cleanup_count += 1;
-                                tracing::debug!(
-                                    "🧹 Cleaned up expired chunk directory: {:?}",
-                                    entry.path()
-                                );
-                            }
+                        if now.as_secs() - created_time.as_secs() > 2 * 3600
+                            && fs::remove_dir_all(entry.path()).await.is_ok()
+                        {
+                            cleanup_count += 1;
+                            tracing::debug!(
+                                "🧹 Cleaned up expired chunk directory: {:?}",
+                                entry.path()
+                            );
                         }
                     }
                 }

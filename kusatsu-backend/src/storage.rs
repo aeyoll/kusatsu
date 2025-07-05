@@ -125,15 +125,12 @@ impl FileStorage {
                 if parent.starts_with(&self.storage_root) && parent != self.storage_root {
                     if let Ok(mut entries) = fs::read_dir(parent).await {
                         // Check if directory is empty
-                        if entries.next_entry().await.unwrap_or(None).is_none() {
-                            if fs::remove_dir(parent).await.is_ok() {
-                                tracing::debug!(
-                                    "🧹 Cleaned up empty directory: {}",
-                                    parent.display()
-                                );
-                                // Recursively clean up parent directories
-                                Box::pin(self.cleanup_empty_dirs(parent)).await;
-                            }
+                        if entries.next_entry().await.unwrap_or(None).is_none()
+                            && fs::remove_dir(parent).await.is_ok()
+                        {
+                            tracing::debug!("🧹 Cleaned up empty directory: {}", parent.display());
+                            // Recursively clean up parent directories
+                            Box::pin(self.cleanup_empty_dirs(parent)).await;
                         }
                     }
                 }

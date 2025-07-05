@@ -131,16 +131,18 @@ pub async fn upload_file(
     // Store file metadata in database
     let _file_record = file_ops::create_file_record(
         &state.db,
-        file_id,
-        original_size,
-        encrypted_size,
-        mime_type,
-        file_path,
-        encrypted_file_data.nonce,
-        encrypted_filename_data.ciphertext,
-        encrypted_filename_data.nonce,
-        expires_at,
-        options.max_downloads,
+        crate::database::CreateFileParams {
+            file_id,
+            original_size,
+            encrypted_size,
+            mime_type,
+            file_path,
+            nonce: encrypted_file_data.nonce,
+            encrypted_filename: encrypted_filename_data.ciphertext,
+            filename_nonce: encrypted_filename_data.nonce,
+            expires_at,
+            max_downloads: options.max_downloads,
+        },
     )
     .await?;
 
@@ -203,14 +205,16 @@ pub async fn start_chunked_upload(
     // Create upload session in database
     let _session = upload_session_ops::create_upload_session(
         &state.db,
-        upload_id,
-        request.filename,
-        request.mime_type,
-        request.file_size,
-        total_chunks,
-        chunk_size,
-        request.expires_in_hours,
-        request.max_downloads,
+        crate::database::CreateUploadSessionParams {
+            upload_id,
+            filename: request.filename,
+            mime_type: request.mime_type,
+            total_size: request.file_size,
+            total_chunks,
+            chunk_size,
+            expires_in_hours: request.expires_in_hours,
+            max_downloads: request.max_downloads,
+        },
     )
     .await?;
 
@@ -401,13 +405,15 @@ pub async fn complete_chunked_upload(
     // Store file metadata in database (unencrypted)
     let _file_record = file_ops::create_unencrypted_file_record(
         &state.db,
-        file_id,
-        session.total_size,
-        session.mime_type,
-        file_path,
-        session.filename.clone(),
-        expires_at,
-        session.max_downloads,
+        crate::database::CreateUnencryptedFileParams {
+            file_id,
+            original_size: session.total_size,
+            mime_type: session.mime_type,
+            file_path,
+            filename: session.filename.clone(),
+            expires_at,
+            max_downloads: session.max_downloads,
+        },
     )
     .await?;
 
@@ -563,8 +569,7 @@ pub async fn download_file_form(
     // Sanitize filename for Content-Disposition header
     let sanitized_filename = original_filename
         .replace('\"', "\\\"")
-        .replace('\n', " ")
-        .replace('\r', " ");
+        .replace(['\n', '\r'], " ");
 
     // Build streaming response with proper headers for direct download
     let response = Response::builder()

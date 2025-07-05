@@ -1,5 +1,5 @@
 use crate::AppRoute;
-use web_sys::{window, Document, Element};
+use web_sys::window;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]

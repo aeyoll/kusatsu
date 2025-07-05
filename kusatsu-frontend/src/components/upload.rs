@@ -46,7 +46,7 @@ pub fn upload(props: &UploadProps) -> Html {
     let expires_in_hours = use_state(|| 24i32);
     let max_downloads = use_state(|| None::<i32>);
     let enable_max_downloads = use_state(|| false);
-    let api_client = use_state(|| ApiClient::new());
+    let api_client = use_state(ApiClient::new);
     let drag_over = use_state(|| false);
 
     let on_file_select = {
@@ -356,13 +356,13 @@ pub fn upload(props: &UploadProps) -> Html {
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3 flex-1 min-w-0">
                                 <span class="text-2xl">{
-                                    (|| {
+                                    {
                                         let mime_type = file.raw_mime_type();
                                         crate::utils::file_utils::get_file_icon(
                                             &file.name(),
                                             if mime_type.is_empty() { None } else { Some(&mime_type) }
                                         )
-                                    })()
+                                    }
                                 }</span>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{&file.name()}</p>
@@ -443,7 +443,7 @@ pub fn upload(props: &UploadProps) -> Html {
             }
 
             // Success display
-            if let UploadState::Completed { file_id, download_url, encryption_key, curl_command } = &*upload_state {
+            if let UploadState::Completed { file_id: _, download_url, encryption_key: _, curl_command } = &*upload_state {
                 <div class="mt-6 p-4 bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-800 rounded-lg">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

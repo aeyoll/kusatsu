@@ -2,6 +2,45 @@ use crate::error::Result;
 use kusatsu_migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use std::time::Duration;
+use uuid::Uuid;
+
+// Parameter structs for database operations
+#[derive(Debug)]
+pub struct CreateFileParams {
+    pub file_id: Uuid,
+    pub original_size: i64,
+    pub encrypted_size: i64,
+    pub mime_type: Option<String>,
+    pub file_path: String,
+    pub nonce: Vec<u8>,
+    pub encrypted_filename: Vec<u8>,
+    pub filename_nonce: Vec<u8>,
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub max_downloads: Option<i32>,
+}
+
+#[derive(Debug)]
+pub struct CreateUnencryptedFileParams {
+    pub file_id: Uuid,
+    pub original_size: i64,
+    pub mime_type: Option<String>,
+    pub file_path: String,
+    pub filename: String,
+    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub max_downloads: Option<i32>,
+}
+
+#[derive(Debug)]
+pub struct CreateUploadSessionParams {
+    pub upload_id: Uuid,
+    pub filename: String,
+    pub mime_type: Option<String>,
+    pub total_size: i64,
+    pub total_chunks: i32,
+    pub chunk_size: i32,
+    pub expires_in_hours: Option<i32>,
+    pub max_downloads: Option<i32>,
+}
 
 pub async fn setup_database(database_url: &str) -> Result<DatabaseConnection> {
     tracing::info!("🔗 Connecting to database: {}", database_url);
@@ -36,28 +75,19 @@ pub mod file_ops {
 
     pub async fn create_file_record(
         db: &DatabaseConnection,
-        file_id: Uuid,
-        original_size: i64,
-        encrypted_size: i64,
-        mime_type: Option<String>,
-        file_path: String,
-        nonce: Vec<u8>,
-        encrypted_filename: Vec<u8>,
-        filename_nonce: Vec<u8>,
-        expires_at: Option<chrono::DateTime<chrono::Utc>>,
-        max_downloads: Option<i32>,
+        params: CreateFileParams,
     ) -> Result<file::Model> {
         let file_model = file::ActiveModel {
-            file_id: Set(file_id),
-            original_size: Set(original_size),
-            encrypted_size: Set(encrypted_size),
-            mime_type: Set(mime_type),
-            file_path: Set(file_path),
-            nonce: Set(nonce),
-            encrypted_filename: Set(encrypted_filename),
-            filename_nonce: Set(filename_nonce),
-            expires_at: Set(expires_at),
-            max_downloads: Set(max_downloads),
+            file_id: Set(params.file_id),
+            original_size: Set(params.original_size),
+            encrypted_size: Set(params.encrypted_size),
+            mime_type: Set(params.mime_type),
+            file_path: Set(params.file_path),
+            nonce: Set(params.nonce),
+            encrypted_filename: Set(params.encrypted_filename),
+            filename_nonce: Set(params.filename_nonce),
+            expires_at: Set(params.expires_at),
+            max_downloads: Set(params.max_downloads),
             ..Default::default()
         };
 
@@ -68,25 +98,19 @@ pub mod file_ops {
     // Create file record for unencrypted files (chunked uploads)
     pub async fn create_unencrypted_file_record(
         db: &DatabaseConnection,
-        file_id: Uuid,
-        original_size: i64,
-        mime_type: Option<String>,
-        file_path: String,
-        filename: String,
-        expires_at: Option<chrono::DateTime<chrono::Utc>>,
-        max_downloads: Option<i32>,
+        params: CreateUnencryptedFileParams,
     ) -> Result<file::Model> {
         let file_model = file::ActiveModel {
-            file_id: Set(file_id),
-            original_size: Set(original_size),
-            encrypted_size: Set(original_size), // Same as original for unencrypted files
-            mime_type: Set(mime_type),
-            file_path: Set(file_path),
+            file_id: Set(params.file_id),
+            original_size: Set(params.original_size),
+            encrypted_size: Set(params.original_size), // Same as original for unencrypted files
+            mime_type: Set(params.mime_type),
+            file_path: Set(params.file_path),
             nonce: Set(Vec::new()), // Empty nonce indicates unencrypted file
-            encrypted_filename: Set(filename.as_bytes().to_vec()), // Store plain filename
+            encrypted_filename: Set(params.filename.as_bytes().to_vec()), // Store plain filename
             filename_nonce: Set(Vec::new()), // Empty nonce for filename
-            expires_at: Set(expires_at),
-            max_downloads: Set(max_downloads),
+            expires_at: Set(params.expires_at),
+            max_downloads: Set(params.max_downloads),
             ..Default::default()
         };
 
@@ -191,24 +215,17 @@ pub mod upload_session_ops {
 
     pub async fn create_upload_session(
         db: &DatabaseConnection,
-        upload_id: Uuid,
-        filename: String,
-        mime_type: Option<String>,
-        total_size: i64,
-        total_chunks: i32,
-        chunk_size: i32,
-        expires_in_hours: Option<i32>,
-        max_downloads: Option<i32>,
+        params: CreateUploadSessionParams,
     ) -> Result<upload_session::Model> {
         let session_model = upload_session::ActiveModel {
-            upload_id: Set(upload_id),
-            filename: Set(filename),
-            mime_type: Set(mime_type),
-            total_size: Set(total_size),
-            total_chunks: Set(total_chunks),
-            chunk_size: Set(chunk_size),
-            expires_in_hours: Set(expires_in_hours),
-            max_downloads: Set(max_downloads),
+            upload_id: Set(params.upload_id),
+            filename: Set(params.filename),
+            mime_type: Set(params.mime_type),
+            total_size: Set(params.total_size),
+            total_chunks: Set(params.total_chunks),
+            chunk_size: Set(params.chunk_size),
+            expires_in_hours: Set(params.expires_in_hours),
+            max_downloads: Set(params.max_downloads),
             ..Default::default()
         };
 

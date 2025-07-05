@@ -6,7 +6,6 @@ mod services;
 mod utils;
 
 use components::{download::Download, header::Header, upload::Upload};
-use utils::url_utils;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum AppRoute {
@@ -56,7 +55,7 @@ pub fn app() -> Html {
     };
 
     let switch = {
-        let upload_result = upload_result.clone();
+        let _upload_result = upload_result.clone();
         let on_upload_complete = on_upload_complete.clone();
 
         move |routes: AppRoute| -> Html {

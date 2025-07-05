@@ -70,6 +70,13 @@ impl std::str::FromStr for OutputFormat {
     }
 }
 
+#[derive(Clone)]
+struct UploadConfig {
+    expires_in_hours: Option<i32>,
+    max_downloads: Option<i32>,
+    output_format: OutputFormat,
+}
+
 // All API types are now defined in kusatsu-types and imported above
 
 #[tokio::main]
@@ -130,32 +137,20 @@ async fn upload_file(
         .first()
         .map(|mime| mime.to_string());
 
+    let config = UploadConfig {
+        expires_in_hours,
+        max_downloads,
+        output_format,
+    };
+
     // Decide between single and chunked upload
     if file_size <= MAX_SINGLE_UPLOAD_SIZE {
         println!("📦 Using single upload (file size: {} bytes)", file_size);
-        perform_single_upload(
-            client,
-            server,
-            file_path,
-            &filename,
-            mime_type,
-            expires_in_hours,
-            max_downloads,
-            output_format,
-        )
-        .await
+        perform_single_upload(client, server, file_path, &filename, mime_type, &config).await
     } else {
         println!("🧩 Using chunked upload (file size: {} bytes)", file_size);
         perform_chunked_upload(
-            client,
-            server,
-            file_path,
-            &filename,
-            file_size,
-            mime_type,
-            expires_in_hours,
-            max_downloads,
-            output_format,
+            client, server, file_path, &filename, file_size, mime_type, &config,
         )
         .await
     }
@@ -167,9 +162,7 @@ async fn perform_single_upload(
     file_path: &Path,
     filename: &str,
     mime_type: Option<String>,
-    expires_in_hours: Option<i32>,
-    max_downloads: Option<i32>,
-    output_format: OutputFormat,
+    config: &UploadConfig,
 ) -> Result<()> {
     // Read the entire file
     let file_data = async_fs::read(file_path)
@@ -192,16 +185,16 @@ async fn perform_single_upload(
     let mut url = format!("{}/api/upload", server);
     let mut params = Vec::new();
 
-    if let Some(hours) = expires_in_hours {
+    if let Some(hours) = config.expires_in_hours {
         params.push(format!("expires_in_hours={}", hours));
     }
 
-    if let Some(max_dl) = max_downloads {
+    if let Some(max_dl) = config.max_downloads {
         params.push(format!("max_downloads={}", max_dl));
     }
 
     if !params.is_empty() {
-        url.push_str("?");
+        url.push('?');
         url.push_str(&params.join("&"));
     }
 
@@ -231,7 +224,7 @@ async fn perform_single_upload(
         .await
         .context("Failed to parse upload response")?;
 
-    print_upload_result(upload_response, output_format)?;
+    print_upload_result(upload_response, config.output_format.clone())?;
     Ok(())
 }
 
@@ -242,9 +235,7 @@ async fn perform_chunked_upload(
     filename: &str,
     file_size: usize,
     mime_type: Option<String>,
-    expires_in_hours: Option<i32>,
-    max_downloads: Option<i32>,
-    output_format: OutputFormat,
+    config: &UploadConfig,
 ) -> Result<()> {
     // Step 1: Start upload session
     println!("🚀 Starting chunked upload session...");
@@ -254,8 +245,8 @@ async fn perform_chunked_upload(
         file_size: file_size as i64,
         mime_type,
         chunk_size: Some(CHUNK_SIZE as i32),
-        expires_in_hours,
-        max_downloads,
+        expires_in_hours: config.expires_in_hours,
+        max_downloads: config.max_downloads,
     };
 
     let start_url = format!("{}/api/upload/start", server);
@@ -371,9 +362,7 @@ async fn perform_chunked_upload(
     // Step 3: Complete upload
     println!("🏁 Completing upload...");
 
-    let complete_request = CompleteUploadRequest {
-        upload_id: upload_id.clone(),
-    };
+    let complete_request = CompleteUploadRequest { upload_id };
 
     let complete_url = format!("{}/api/upload/complete", server);
     let complete_response = client
@@ -409,7 +398,7 @@ async fn perform_chunked_upload(
         curl_command: complete_upload_response.curl_command,
     };
 
-    print_upload_result(upload_response, output_format)?;
+    print_upload_result(upload_response, config.output_format.clone())?;
     Ok(())
 }
 
