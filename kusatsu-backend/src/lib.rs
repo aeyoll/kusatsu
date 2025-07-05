@@ -56,10 +56,14 @@ pub async fn run_server() -> Result<()> {
     let chunk_storage = ChunkStorage::new(&config.storage_dir);
     chunk_storage.init().await?;
 
+    // Extract config values before moving state
+    let server_address = config.server_address.clone();
+    let storage_dir = config.storage_dir.clone();
+
     // Create application state
     let state = AppState {
         db,
-        config: config.clone(),
+        config,
         storage,
         chunk_storage,
     };
@@ -68,20 +72,20 @@ pub async fn run_server() -> Result<()> {
     let app = create_app(state);
 
     // Create TCP listener
-    let listener = tokio::net::TcpListener::bind(&config.server_address)
+    let listener = tokio::net::TcpListener::bind(&server_address)
         .await
         .map_err(|e| {
             AppError::ServerError(format!(
                 "Failed to bind to {}: {}",
-                config.server_address, e
+                server_address, e
             ))
         })?;
 
     tracing::info!(
         "🚀 Kusatsu backend server starting on {}",
-        config.server_address
+        server_address
     );
-    tracing::info!("📁 File storage directory: {}", config.storage_dir);
+    tracing::info!("📁 File storage directory: {}", storage_dir);
 
     // Start the server
     axum::serve(listener, app)

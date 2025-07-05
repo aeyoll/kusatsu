@@ -224,7 +224,7 @@ async fn perform_single_upload(
         .await
         .context("Failed to parse upload response")?;
 
-    print_upload_result(upload_response, config.output_format.clone())?;
+    print_upload_result(upload_response, &config.output_format)?;
     Ok(())
 }
 
@@ -398,16 +398,16 @@ async fn perform_chunked_upload(
         curl_command: complete_upload_response.curl_command,
     };
 
-    print_upload_result(upload_response, config.output_format.clone())?;
+    print_upload_result(upload_response, &config.output_format)?;
     Ok(())
 }
 
-fn print_upload_result(upload_response: UploadResponse, output_format: OutputFormat) -> Result<()> {
+fn print_upload_result(upload_response: UploadResponse, output_format: &OutputFormat) -> Result<()> {
     // Create the complete shareable URL with encryption key (if available)
     let shareable_url = if let Some(ref encryption_key) = upload_response.encryption_key {
         format!("{}#{}", upload_response.download_url, encryption_key)
     } else {
-        upload_response.download_url.clone()
+        upload_response.download_url.to_string()
     };
 
     match output_format {
