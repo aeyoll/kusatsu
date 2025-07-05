@@ -1,7 +1,6 @@
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
-
 use crate::services::api::ApiClient;
 use crate::utils::file_utils;
 
@@ -54,7 +53,10 @@ pub fn download(props: &DownloadProps) -> Html {
             spawn_local(async move {
                 let api_client = ApiClient::new();
 
-                match api_client.get_file_info(&file_id, key_from_url.as_deref()).await {
+                match api_client
+                    .get_file_info(&file_id, key_from_url.as_deref())
+                    .await
+                {
                     Ok(info) => {
                         file_info.set(Some(info.clone()));
                         state.set(DownloadState::Ready {
@@ -86,8 +88,6 @@ pub fn download(props: &DownloadProps) -> Html {
 
     let api_client = ApiClient::new();
     let base_url = api_client.base_url;
-
-
 
     html! {
         <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">

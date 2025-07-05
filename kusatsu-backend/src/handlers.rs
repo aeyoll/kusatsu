@@ -10,8 +10,8 @@ use uuid::Uuid;
 use crate::{
     database::{file_ops, upload_session_ops},
     error::{AppError, Result},
-    AppState, ChunkUploadResponse, CompleteUploadRequest, CompleteUploadResponse, DownloadRequest,
-    FileInfo, StartUploadRequest, StartUploadResponse, UploadOptions, UploadResponse,
+    AppState, ChunkUploadResponse, CompleteUploadRequest, DownloadRequest, FileInfo,
+    StartUploadRequest, StartUploadResponse, UploadOptions, UploadResponse,
 };
 use serde::{Deserialize, Serialize};
 
@@ -148,10 +148,16 @@ pub async fn upload_file(
     let encoded_key = encryption_key.to_base64();
 
     // Generate download URL
-    let download_url = format!("{}/download/{}#{}", state.config.base_url, file_id, encoded_key);
+    let download_url = format!(
+        "{}/download/{}#{}",
+        state.config.base_url, file_id, encoded_key
+    );
 
     // Generate curl command
-    let curl_command = format!("curl -X POST -JLO -d 'encryption_key={}' {}/api/files/{}/form", encoded_key, state.config.api_url, file_id);
+    let curl_command = format!(
+        "curl -X POST -JLO -d 'encryption_key={}' {}/api/files/{}/form",
+        encoded_key, state.config.api_url, file_id
+    );
 
     tracing::info!(
         "📁 File uploaded and encrypted server-side: {} ({} bytes -> {} bytes encrypted)",
@@ -345,7 +351,7 @@ pub async fn upload_chunk(
 pub async fn complete_chunked_upload(
     State(state): State<AppState>,
     Json(request): Json<CompleteUploadRequest>,
-) -> Result<Json<CompleteUploadResponse>> {
+) -> Result<Json<UploadResponse>> {
     // Get upload session
     let session = upload_session_ops::get_upload_session_by_id(&state.db, request.upload_id)
         .await?
@@ -432,9 +438,12 @@ pub async fn complete_chunked_upload(
         session.total_size
     );
 
-    let curl_command = format!("curl -X POST -JLO -d \"encryption_key=\" {}/api/files/{}/form", state.config.api_url, file_id);
+    let curl_command = format!(
+        "curl -X POST -JLO -d \"encryption_key=\" {}/api/files/{}/form",
+        state.config.api_url, file_id
+    );
 
-    Ok(Json(CompleteUploadResponse {
+    Ok(Json(UploadResponse {
         file_id,
         download_url,
         encryption_key: None,
@@ -618,9 +627,9 @@ pub async fn get_file_info(
     let decrypted_filename = if is_encrypted {
         tracing::info!("Decrypting filename for encrypted file {}", file_id);
         // Handle encrypted file (direct upload)
-        let encryption_key_str = download_request.encryption_key
-            .as_ref()
-            .ok_or_else(|| AppError::BadRequest("Encryption key required for encrypted file".to_string()))?;
+        let encryption_key_str = download_request.encryption_key.as_ref().ok_or_else(|| {
+            AppError::BadRequest("Encryption key required for encrypted file".to_string())
+        })?;
 
         let encryption_key = EncryptionKey::from_url_encoded(encryption_key_str)
             .map_err(|_| AppError::BadRequest("Invalid encryption key".to_string()))?;
@@ -670,9 +679,7 @@ pub async fn get_file_info(
 }
 
 // Cleanup expired files endpoint
-pub async fn cleanup_expired_files(
-    State(state): State<AppState>,
-) -> Result<Json<CleanupResponse>> {
+pub async fn cleanup_expired_files(State(state): State<AppState>) -> Result<Json<CleanupResponse>> {
     tracing::info!("🧹 Starting cleanup of expired files");
 
     let cleaned_count = file_ops::cleanup_expired_files(&state.db, &state.storage).await?;
@@ -692,7 +699,9 @@ pub async fn cleanup_expired_upload_sessions(
 ) -> Result<Json<CleanupResponse>> {
     tracing::info!("🧹 Starting cleanup of expired upload sessions");
 
-    let cleaned_count = upload_session_ops::cleanup_expired_upload_sessions(&state.db, &state.chunk_storage).await?;
+    let cleaned_count =
+        upload_session_ops::cleanup_expired_upload_sessions(&state.db, &state.chunk_storage)
+            .await?;
 
     tracing::info!("✅ Cleaned up {} expired upload sessions", cleaned_count);
 

@@ -72,8 +72,6 @@ impl std::str::FromStr for OutputFormat {
 
 // All API types are now defined in kusatsu-types and imported above
 
-
-
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -125,11 +123,7 @@ async fn upload_file(
         .to_string_lossy()
         .to_string();
 
-    println!(
-        "📁 Uploading file: {} ({} bytes)",
-        filename,
-        file_size
-    );
+    println!("📁 Uploading file: {} ({} bytes)", filename, file_size);
 
     // Detect MIME type
     let mime_type = mime_guess::from_path(file_path)
@@ -330,17 +324,12 @@ async fn perform_chunked_upload(
             .with_context(|| format!("Failed to read chunk {}", chunk_number))?;
 
         // Upload chunk
-        let chunk_url = format!(
-            "{}/api/upload/chunk/{}/{}",
-            server, upload_id, chunk_number
-        );
+        let chunk_url = format!("{}/api/upload/chunk/{}/{}", server, upload_id, chunk_number);
 
-        let chunk_form = multipart::Form::new()
-            .part(
-                "chunk",
-                multipart::Part::bytes(chunk_data)
-                    .file_name(format!("chunk_{}", chunk_number)),
-            );
+        let chunk_form = multipart::Form::new().part(
+            "chunk",
+            multipart::Part::bytes(chunk_data).file_name(format!("chunk_{}", chunk_number)),
+        );
 
         let chunk_response = client
             .post(&chunk_url)
@@ -370,7 +359,10 @@ async fn perform_chunked_upload(
 
         // Update progress bar
         pb.set_position(chunk_upload_response.uploaded_chunks as u64);
-        pb.set_message(format!("Uploaded {} bytes", start_offset + current_chunk_size));
+        pb.set_message(format!(
+            "Uploaded {} bytes",
+            start_offset + current_chunk_size
+        ));
     }
 
     // Finish progress bar
@@ -404,7 +396,7 @@ async fn perform_chunked_upload(
         ));
     }
 
-    let complete_upload_response: CompleteUploadResponse = complete_response
+    let complete_upload_response: UploadResponse = complete_response
         .json()
         .await
         .context("Failed to parse complete upload response")?;
@@ -421,10 +413,7 @@ async fn perform_chunked_upload(
     Ok(())
 }
 
-fn print_upload_result(
-    upload_response: UploadResponse,
-    output_format: OutputFormat,
-) -> Result<()> {
+fn print_upload_result(upload_response: UploadResponse, output_format: OutputFormat) -> Result<()> {
     // Create the complete shareable URL with encryption key (if available)
     let shareable_url = if let Some(ref encryption_key) = upload_response.encryption_key {
         format!("{}#{}", upload_response.download_url, encryption_key)

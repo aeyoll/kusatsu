@@ -1,6 +1,9 @@
-use crate::{services::api::{ApiClient, StartUploadRequest}, utils::url_utils};
+use crate::{
+    services::api::{ApiClient, StartUploadRequest},
+    utils::url_utils,
+};
 use gloo::file::File;
-use web_sys::{Event, HtmlInputElement, DragEvent};
+use web_sys::{DragEvent, Event, HtmlInputElement};
 use yew::prelude::*;
 
 // Constants
@@ -183,7 +186,12 @@ pub fn upload(props: &UploadProps) -> Html {
                                     encryption_key: encryption_key.clone(),
                                     curl_command: curl_command.clone(),
                                 });
-                                on_upload_complete.emit((file_id, download_url, encryption_key, curl_command));
+                                on_upload_complete.emit((
+                                    file_id,
+                                    download_url,
+                                    encryption_key,
+                                    curl_command,
+                                ));
                             }
                             Err(error) => {
                                 upload_state.set(UploadState::Error(error));
@@ -209,7 +217,12 @@ pub fn upload(props: &UploadProps) -> Html {
                                     encryption_key: encryption_key.clone(),
                                     curl_command: curl_command.clone(),
                                 });
-                                on_upload_complete.emit((file_id, download_url, encryption_key, curl_command));
+                                on_upload_complete.emit((
+                                    file_id,
+                                    download_url,
+                                    encryption_key,
+                                    curl_command,
+                                ));
                             }
                             Err(error) => {
                                 upload_state.set(UploadState::Error(error));
@@ -277,11 +290,12 @@ pub fn upload(props: &UploadProps) -> Html {
         })
     };
 
-    let is_uploading = matches!(*upload_state,
-        UploadState::Preparing |
-        UploadState::StartingUpload |
-        UploadState::UploadingChunks { .. } |
-        UploadState::Completing
+    let is_uploading = matches!(
+        *upload_state,
+        UploadState::Preparing
+            | UploadState::StartingUpload
+            | UploadState::UploadingChunks { .. }
+            | UploadState::Completing
     );
 
     html! {
@@ -672,7 +686,9 @@ async fn perform_chunked_upload(
     Ok((
         complete_response.file_id.to_string(),
         complete_response.download_url,
-        complete_response.encryption_key.unwrap_or_else(|| "".to_string()),
+        complete_response
+            .encryption_key
+            .unwrap_or_else(|| "".to_string()),
         complete_response.curl_command,
     ))
 }

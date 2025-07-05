@@ -41,11 +41,26 @@ pub fn get_file_icon(filename: &str, mime_type: Option<&str>) -> &'static str {
         "📝"
     } else if name.ends_with(".zip") || name.ends_with(".rar") || name.ends_with(".7z") {
         "📦"
-    } else if name.ends_with(".jpg") || name.ends_with(".jpeg") || name.ends_with(".png") || name.ends_with(".gif") || name.ends_with(".webp") || name.ends_with(".svg") {
+    } else if name.ends_with(".jpg")
+        || name.ends_with(".jpeg")
+        || name.ends_with(".png")
+        || name.ends_with(".gif")
+        || name.ends_with(".webp")
+        || name.ends_with(".svg")
+    {
         "🖼️"
-    } else if name.ends_with(".mp4") || name.ends_with(".avi") || name.ends_with(".mov") || name.ends_with(".mkv") || name.ends_with(".webm") {
+    } else if name.ends_with(".mp4")
+        || name.ends_with(".avi")
+        || name.ends_with(".mov")
+        || name.ends_with(".mkv")
+        || name.ends_with(".webm")
+    {
         "🎥"
-    } else if name.ends_with(".mp3") || name.ends_with(".wav") || name.ends_with(".flac") || name.ends_with(".ogg") {
+    } else if name.ends_with(".mp3")
+        || name.ends_with(".wav")
+        || name.ends_with(".flac")
+        || name.ends_with(".ogg")
+    {
         "🎵"
     } else {
         "📁"

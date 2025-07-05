@@ -52,14 +52,6 @@ pub struct ChunkUploadResponse {
     pub progress: f32,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct CompleteUploadResponse {
-    pub file_id: Uuid,
-    pub download_url: String,
-    pub encryption_key: Option<String>,
-    pub curl_command: String,
-}
-
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 pub struct FileInfo {
     pub file_id: Uuid,

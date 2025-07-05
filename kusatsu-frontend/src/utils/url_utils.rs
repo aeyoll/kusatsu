@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{window, HtmlInputElement, HtmlElement, HtmlDocument};
+use web_sys::{window, HtmlDocument, HtmlElement, HtmlInputElement};
 
 pub async fn copy_to_clipboard(text: &str) -> Result<(), JsValue> {
     let window = window().ok_or("no global `window` exists")?;

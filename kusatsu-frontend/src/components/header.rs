@@ -1,6 +1,6 @@
 use crate::AppRoute;
-use yew::prelude::*;
 use web_sys::{window, Document, Element};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct HeaderProps {
@@ -19,7 +19,11 @@ pub fn header(props: &HeaderProps) -> Html {
                 }
             }
             // Fallback to system preference
-            if let Some(media_query) = window.match_media("(prefers-color-scheme: dark)").ok().flatten() {
+            if let Some(media_query) = window
+                .match_media("(prefers-color-scheme: dark)")
+                .ok()
+                .flatten()
+            {
                 return media_query.matches();
             }
         }

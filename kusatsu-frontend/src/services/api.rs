@@ -1,6 +1,6 @@
 use gloo::net::http::Request;
-use web_sys::FormData;
 use uuid::Uuid;
+use web_sys::FormData;
 
 // Re-export shared types
 pub use kusatsu_types::*;
@@ -37,17 +37,16 @@ impl ApiClient {
         file_id: &str,
         encryption_key: Option<&str>,
     ) -> Result<FileInfo, ApiError> {
-        let url = format!(
-            "{}/api/files/{}/info",
-            self.base_url, file_id
-        );
+        let url = format!("{}/api/files/{}/info", self.base_url, file_id);
 
         let request = if let Some(encryption_key) = encryption_key {
             DownloadRequest {
                 encryption_key: Some(encryption_key.to_string()),
             }
         } else {
-            DownloadRequest { encryption_key: None }
+            DownloadRequest {
+                encryption_key: None,
+            }
         };
 
         let response = Request::post(&url)
@@ -225,7 +224,7 @@ impl ApiClient {
     pub async fn complete_chunked_upload(
         &self,
         upload_id: &str,
-    ) -> Result<CompleteUploadResponse, ApiError> {
+    ) -> Result<UploadResponse, ApiError> {
         let url = format!("{}/api/upload/complete", self.base_url);
 
         let upload_uuid = Uuid::parse_str(upload_id)

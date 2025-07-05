@@ -39,7 +39,12 @@ pub fn app() -> Html {
     let on_upload_complete = {
         let upload_result = upload_result.clone();
         Callback::from(
-            move |(file_id, download_url, encryption_key, curl_command): (String, String, String, String)| {
+            move |(file_id, download_url, encryption_key, curl_command): (
+                String,
+                String,
+                String,
+                String,
+            )| {
                 upload_result.set(Some(UploadResult {
                     file_id,
                     download_url,
