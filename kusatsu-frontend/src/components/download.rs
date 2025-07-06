@@ -58,12 +58,27 @@ pub fn download(props: &DownloadProps) -> Html {
                     .await
                 {
                     Ok(info) => {
+                        let max_downloads = info.max_downloads;
+                        let download_count = info.download_count;
+                        let is_expired = info.expires_at.is_some()
+                            && info.expires_at.unwrap() < chrono::Utc::now();
+
                         file_info.set(Some(info.clone()));
-                        state.set(DownloadState::Ready {
-                            filename: info.filename,
-                            size: info.original_size as usize,
-                            is_encrypted: info.is_encrypted,
-                        });
+
+                        if max_downloads.is_some() && max_downloads.unwrap() == download_count {
+                            state.set(DownloadState::Error(format!(
+                                "The maximum download limit of {} has been reached",
+                                max_downloads.unwrap()
+                            )));
+                        } else if is_expired {
+                            state.set(DownloadState::Error("The file has expired".to_string()));
+                        } else {
+                            state.set(DownloadState::Ready {
+                                filename: info.filename,
+                                size: info.original_size as usize,
+                                is_encrypted: info.is_encrypted,
+                            });
+                        }
                     }
                     Err(e) => {
                         state.set(DownloadState::Error(format!(

@@ -402,7 +402,10 @@ async fn perform_chunked_upload(
     Ok(())
 }
 
-fn print_upload_result(upload_response: UploadResponse, output_format: &OutputFormat) -> Result<()> {
+fn print_upload_result(
+    upload_response: UploadResponse,
+    output_format: &OutputFormat,
+) -> Result<()> {
     // Create the complete shareable URL with encryption key (if available)
     let shareable_url = if let Some(ref encryption_key) = upload_response.encryption_key {
         format!("{}#{}", upload_response.download_url, encryption_key)

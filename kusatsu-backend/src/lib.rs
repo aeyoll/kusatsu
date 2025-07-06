@@ -75,16 +75,10 @@ pub async fn run_server() -> Result<()> {
     let listener = tokio::net::TcpListener::bind(&server_address)
         .await
         .map_err(|e| {
-            AppError::ServerError(format!(
-                "Failed to bind to {}: {}",
-                server_address, e
-            ))
+            AppError::ServerError(format!("Failed to bind to {}: {}", server_address, e))
         })?;
 
-    tracing::info!(
-        "🚀 Kusatsu backend server starting on {}",
-        server_address
-    );
+    tracing::info!("🚀 Kusatsu backend server starting on {}", server_address);
     tracing::info!("📁 File storage directory: {}", storage_dir);
 
     // Start the server

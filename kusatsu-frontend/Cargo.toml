@@ -74,3 +74,4 @@ kusatsu-encrypt = { path = "../kusatsu-encrypt" }
 kusatsu-types = { path = "../kusatsu-types" }
 yew-router = "0.18.0"
 log = "0.4.27"
+chrono = { workspace = true }
