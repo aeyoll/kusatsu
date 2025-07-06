@@ -274,9 +274,16 @@ pub fn upload(props: &UploadProps) -> Html {
 
     let on_max_downloads_toggle = {
         let enable_max_downloads = enable_max_downloads.clone();
+        let max_downloads = max_downloads.clone();
         Callback::from(move |e: Event| {
             let input: web_sys::HtmlInputElement = e.target_unchecked_into();
-            enable_max_downloads.set(input.checked());
+            let is_checked = input.checked();
+            enable_max_downloads.set(is_checked);
+            if is_checked {
+                max_downloads.set(Some(1));
+            } else {
+                max_downloads.set(None);
+            }
         })
     };
 
