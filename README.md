@@ -16,7 +16,7 @@ This workspace contains multiple crates:
 kusatsu/
 ├── kusatsu-backend/     # Axum-based REST API server
 ├── kusatsu-cli/         # Command-line interface
-├── kusatsu-encrypt/     # Client-side encryption library
+├── kusatsu-encrypt/     # Encryption library
 ├── kusatsu-entity/      # Database models (SeaORM)
 ├── kusatsu-frontend/    # Web interface (Yew/WASM)
 └── kusatsu-migration/   # Database migrations
@@ -25,9 +25,9 @@ kusatsu/
 ### Core Components
 
 - **`kusatsu-encrypt`**: Handles AES-256-GCM encryption/decryption, key generation, and secure key handling
-- **`kusatsu-entity`**: Database models for file metadata (no plaintext data stored)
+- **`kusatsu-entity`**: Database models for file metadata
 - **`kusatsu-migration`**: Database schema and migrations
-- **`kusatsu-backend`**: REST API for file upload/download (handles only encrypted data)
+- **`kusatsu-backend`**: REST API for file upload/download
 - **`kusatsu-cli`**: Command-line tool for uploading files
 - **`kusatsu-frontend`**: Web-based drag-and-drop interface
 
