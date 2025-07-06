@@ -157,7 +157,7 @@ pub async fn upload_file(
 
     // Generate curl command
     let curl_command = format!(
-        "curl -X POST -JLO -d 'encryption_key={}' {}/api/files/{}/form",
+        "curl -X POST -JLO --fail -d 'encryption_key={}' {}/api/files/{}/form",
         encoded_key, state.config.api_url, file_id
     );
 
@@ -445,7 +445,7 @@ pub async fn complete_chunked_upload(
     );
 
     let curl_command = format!(
-        "curl -X POST -JLO -d \"encryption_key=\" {}/api/files/{}/form",
+        "curl -X POST -JLO --fail -d \"encryption_key=\" {}/api/files/{}/form",
         state.config.api_url, file_id
     );
 
