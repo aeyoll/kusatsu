@@ -152,7 +152,7 @@ pub fn download(props: &DownloadProps) -> Html {
                                                 </p>
                                             </div>
                                         </div>
-                                        <form method="POST" action={format!("{}/api/files/{}/form", base_url, props.file_id)}>
+                                        <form method="POST" action={format!("{}/api/files/{}/download", base_url, props.file_id)}>
                                             <input type="hidden" name="encryption_key" value={
                                                 if let Some(key) = &*encryption_key {
                                                     key.clone()

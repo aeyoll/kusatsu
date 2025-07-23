@@ -94,7 +94,7 @@ fn create_app(state: AppState) -> Router {
         // File operations (legacy single upload)
         .route("/api/upload", post(handlers::upload_file))
         .route(
-            "/api/files/:file_id/form",
+            "/api/files/:file_id/download",
             post(handlers::download_file_form),
         )
         .route("/api/files/:file_id/info", post(handlers::get_file_info))
