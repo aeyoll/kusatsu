@@ -54,11 +54,13 @@ cargo test -p kusatsu-encrypt
 
 ```bash
 # Set environment variables (optional - defaults provided)
-export DATABASE_URL="sqlite://kusatsu.db"
-export SERVER_ADDRESS="127.0.0.1:3000"
-export BASE_URL="http://localhost:3000"
-export MAX_FILE_SIZE="100"  # MB
-export STORAGE_DIR="./storage"
+export KUSATSU_DATABASE_URL="sqlite://kusatsu.db"
+export KUSATSU_SERVER_ADDRESS="127.0.0.1:3000"
+export KUSATSU_BASE_URL="http://localhost:3000"
+export KUSATSU_MAX_FILE_SIZE="100"  # MB
+export KUSATSU_STORAGE_DIR="./storage"
+export KUSATSU_API_URL="http://localhost:3000"
+export KUSATSU_CLEANUP_INTERVAL_HOURS="24"
 
 # Run the backend server
 cargo run -p kusatsu-backend
@@ -111,13 +113,13 @@ The backend uses environment variables for configuration:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `sqlite://kusatsu.db` | Database connection string |
-| `SERVER_ADDRESS` | `127.0.0.1:3000` | Server bind address |
-| `BASE_URL` | `http://localhost:8080` | Public base URL for browser access |
-| `API_URL` | `http://localhost:3000` | API base URL for direct downloads |
-| `MAX_FILE_SIZE` | `100` | Maximum file size in MB |
-| `STORAGE_DIR` | `./storage` | File storage directory |
-| `CLEANUP_INTERVAL_HOURS` | `24` | Expired file cleanup interval |
+| `KUSATSU_DATABASE_URL` | `sqlite://kusatsu.db` | Database connection string |
+| `KUSATSU_SERVER_ADDRESS` | `127.0.0.1:3000` | Server bind address |
+| `KUSATSU_BASE_URL` | `http://localhost:8080` | Public base URL for browser access |
+| `KUSATSU_API_URL` | `http://localhost:3000` | API base URL for direct downloads |
+| `KUSATSU_MAX_FILE_SIZE` | `100` | Maximum file size in MB |
+| `KUSATSU_STORAGE_DIR` | `./storage` | File storage directory |
+| `KUSATSU_CLEANUP_INTERVAL_HOURS` | `24` | Expired file cleanup interval |
 
 ## License
 
