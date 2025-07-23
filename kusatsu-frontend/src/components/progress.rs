@@ -3,7 +3,7 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct ProgressProps {
     pub progress: f32, // 0.0 to 1.0
-    pub message: String,
+    pub message: AttrValue,
     pub show_percentage: bool,
 }
 
@@ -11,7 +11,7 @@ impl Default for ProgressProps {
     fn default() -> Self {
         Self {
             progress: 0.0,
-            message: "Processing...".to_string(),
+            message: "Processing...".into(),
             show_percentage: true,
         }
     }
@@ -25,7 +25,7 @@ pub fn progress(props: &ProgressProps) -> Html {
     html! {
         <div class="progress-container">
             <div class="progress-message">
-                {&props.message}
+                {props.message.to_string()}
             </div>
 
             <div class="progress-bar">
@@ -43,7 +43,7 @@ pub fn progress(props: &ProgressProps) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct SpinnerProps {
-    pub message: Option<String>,
+    pub message: Option<AttrValue>,
 }
 
 #[function_component(Spinner)]
@@ -53,7 +53,7 @@ pub fn spinner(props: &SpinnerProps) -> Html {
             <div class="spinner"></div>
             if let Some(message) = &props.message {
                 <div class="spinner-message">
-                    {message}
+                    {message.to_string()}
                 </div>
             }
         </div>

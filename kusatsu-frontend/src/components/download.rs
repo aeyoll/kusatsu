@@ -19,12 +19,12 @@ enum DownloadState {
 
 #[derive(Properties, PartialEq)]
 pub struct DownloadProps {
-    pub file_id: String,
+    pub file_id: AttrValue,
 }
 
 #[function_component(Download)]
 pub fn download(props: &DownloadProps) -> Html {
-    let file_id = props.file_id.clone();
+    let file_id = props.file_id.to_string();
     let state = use_state(|| DownloadState::Loading);
     let encryption_key = use_state(|| None::<String>);
     let file_info = use_state(|| None::<crate::services::api::FileInfo>);
